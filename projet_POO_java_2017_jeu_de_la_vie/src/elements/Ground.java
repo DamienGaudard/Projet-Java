@@ -2,14 +2,22 @@ package elements;
 
 import java.awt.Rectangle;
 
-public class Ground extends Cell{
+import diplayable.Displayable;
+import diplayable.Sprite;
 
-	public Ground(int posX, int posY) {
-		super(posX, posY);
-	}
-
+public class Ground extends Displayable{
 	private static final String img_path = "ground.png";
 	private static Sprite ground_sprite = null;
+	private int etat;
+	
+	public Ground(int posX, int posY) {
+		super(posX, posY);
+		etat = 0;
+	}
+
+	public void setEtat(int etat) {
+		this.etat = etat;
+	}
 
 	public Sprite get_sprite_info(){
 		
@@ -21,7 +29,7 @@ public class Ground extends Cell{
 	}
 
 	public Rectangle selection_sprite() {
-		return new Rectangle(0,0,32,32);
+		return new Rectangle(0,this.etat*32,32,32);
 	}
 
 	public int get_width() {

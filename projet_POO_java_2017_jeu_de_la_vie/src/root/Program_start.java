@@ -1,49 +1,55 @@
 package root;
 
+import display.Home;
 import display.Layout;
 import display.Window;
+import display.Window.CamMovementMouse;
 
 public class Program_start{
 	
 	static Window w;
 	static Layout l;
-
-	public static void main(String[] args) throws InterruptedException{
-		
-		w = new Window(1600,1000);
-		l = new Layout(1600,1000,50,50,32);
-		w.setContentPane(l);
-
-		Thread auto_refresh = new Thread(new Program_start().new Auto_refresh_display());
-		auto_refresh.start();
-		
-		int i = 0;
-		while(true) {
-			
-			l.time_flies(); //dure ~ 1 sec
-			
-			i = i + 1 % 10;
-		}
-		
-	}
+	static Home home;
 	
-	public class Auto_refresh_display implements Runnable{
+	public static void main(String[] args) throws InterruptedException{
 
+		home = new Home();
+		l = new Layout(0,0,50,50,32);
+		w = new Window(32*28,32*28, l);
+		w.setContentPane(home);
+		w.setVisible(true);
+		w.revalidate();
 		
+		while(home.getChoice() == 1000)
+			Thread.sleep(100);
 		
-		public void run() {
+		if(home.getChoice() == 1){
+			//afficher l'aide
+			
+		}else if(home.getChoice() == 2){
+			System.exit(0);
+			
+		}else if(home.getChoice() == 0){
+			
+			w.setSize(900,900);
+			w.setContentPane(l);
+			w.addMouseWheelListener(w.new Zoom());
+			w.addKeyListener(w.new CamMovement());
+			CamMovementMouse cmm = w.new CamMovementMouse();
+			w.addMouseListener(cmm);
+			w.addMouseMotionListener(cmm);
+			w.setResizable(true);
+			w.revalidate();
+			w.requestFocus(); // pour faire fonctionner le clavier sous windows
+			w.auto_refresh();
 			
 			while(true) {
-				w.repaint();
-				try {
-					Thread.sleep(25);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
+				
+				l.time_flies(500); //dure ~ 0.5sec
+				
 			}
 			
 		}
-		
 	}
 
 }
