@@ -1,8 +1,10 @@
 package diplayable;
 
 import java.awt.Image;
+import java.awt.Toolkit;
 import java.io.File;
 import java.io.IOException;
+
 import javax.imageio.ImageIO;
 
 public class Sprite {
@@ -17,9 +19,8 @@ public class Sprite {
 		this.img_addr = img_addr;
 		this.img_texture = null;
 		try {
-			this.img_texture = ImageIO.read(new File(this.img_addr));
+			this.img_texture = ImageIO.read(getClass().getResource("/"+this.img_addr));
 		} catch (IOException e) {
-			System.out.println("l'adresse " + this.img_addr + " est invalide");
 			e.printStackTrace();
 		}
 		

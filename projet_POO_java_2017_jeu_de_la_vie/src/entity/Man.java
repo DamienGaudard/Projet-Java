@@ -39,6 +39,7 @@ public class Man extends Human{
 		if(this.wife.isDying()){
 			this.wife = null;
 			this.path = null;
+			this.unTarget();
 			return false;
 		}
 		else
@@ -55,11 +56,14 @@ public class Man extends Human{
 
 	@Override
 	public void rapture() {
-			if(this.hasPartner()) {
+		if(this.hasPartner()) {
 			
 			Human partner = this.wife;
 			this.setPartner(null);
 			partner.rapture();
+			
+			path = null;
+			setTarget(null);
 			
 		}
 		

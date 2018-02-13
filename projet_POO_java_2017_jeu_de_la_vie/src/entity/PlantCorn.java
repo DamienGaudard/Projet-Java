@@ -27,7 +27,7 @@ public class PlantCorn extends Non_human{
 	}
 
 	public boolean isFunctional() {
-		return false;
+		return true;
 	}
 
 	public boolean isDying() {
@@ -39,7 +39,7 @@ public class PlantCorn extends Non_human{
 	}
 
 	public Rectangle selection_sprite() {
-		return null;
+		return new Rectangle(0,0,0,0);
 	}
 
 	public int get_width() {

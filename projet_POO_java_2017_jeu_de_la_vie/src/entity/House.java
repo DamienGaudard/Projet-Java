@@ -12,6 +12,9 @@ public class House extends Non_human{
 		mother = null;
 		child = null;
 		this.full = false;
+		this.active = false;
+		this.nb_of_men = 0;
+		this.nb_of_women = 0;
 	}
 
 	private static final String img_path = "house.png";
@@ -22,6 +25,18 @@ public class House extends Non_human{
 	private Human child;
 	
 	private boolean full;
+	private boolean active;
+
+	private int nb_of_men;
+	private int nb_of_women;
+	
+	public int getNb_of_men() {
+		return nb_of_men;
+	}
+
+	public int getNb_of_women() {
+		return nb_of_women;
+	}
 
 	// affichage
 	
@@ -39,7 +54,7 @@ public class House extends Non_human{
 			return new Rectangle(0,0,216,218);
 		}
 		else {
-			return new Rectangle(0,219,216,218);
+			return new Rectangle(0,218,216,218);
 		}
 		
 	}
@@ -76,14 +91,21 @@ public class House extends Non_human{
 	}
 	
 	public boolean isFunctional() {
-		return !this.isMarked();
+		return !this.isMarked() && !active;
 	}
 
 	public boolean isDying() {
 		return false;
 	}
 	
-	public boolean enterHouse(Human enteringHuman) {
+	public boolean enterHouse(Human enteringHuman) throws Exception {
+		
+		this.active = true;
+		
+		if(full) {
+			System.err.println("Erreur, entree alors que la maison est pleine marked=" + isMarked());
+			throw new Exception();
+		}
 		
 		if(enteringHuman.getClass() == Man.class) {
 			
@@ -91,6 +113,7 @@ public class House extends Non_human{
 				return false;
 			else {
 				this.father = (Man)enteringHuman;
+				nb_of_men ++;
 				return true;
 			}
 				
@@ -101,6 +124,7 @@ public class House extends Non_human{
 				return false;
 			else {
 				this.mother = (Woman)enteringHuman;
+				nb_of_women ++;
 				return true;
 			}
 				
@@ -112,28 +136,48 @@ public class House extends Non_human{
 		return full;
 	}
 	
-	// a redef
 	public Human exitHouse() {
 		
 		Human result = null;
 		
+		// si tout le monde est sorti 
+		if(this.mother == null && this.father == null && this.child == null && !active && full) {
+			this.full = false;
+			this.unmark();
+		}
+
 		if((this.entity_age > 1 && father != null) || (father != null && !father.hasPartner())) {
+			
+			if(!father.hasPartner())
+				this.active = false;
+			
 			result = this.father;
 			this.father.setPartner(null);
 			this.father = null;
+			nb_of_men -- ;
+			
 		}
 		else if((this.entity_age > 5 && mother != null) || (mother != null && !mother.hasPartner())) {
+
+			if(!mother.hasPartner())
+				this.active = false;
+			
 			result = this.mother;
 			this.mother.setPartner(null);
 			this.mother.resetCount();
 			this.mother = null;
+			nb_of_women --;
+			
 		}
 		else if(this.entity_age > 10 && child != null) {
+			
 			result = this.child;
+			active = false;
 			this.child = null;
-			// tout le monde est parti la maison est dispo
-			this.full = false;
-			this.unmark();
+			nb_of_men = 0;
+			nb_of_women = 0;
+			this.entity_age = 0;
+			
 		}
 		
 		return result;
@@ -143,14 +187,18 @@ public class House extends Non_human{
 	public void updateHouse() {
 	
 		// naissance humain
-		if(this.entity_age >= 5 && this.child == null) {
+		if(this.entity_age == 4 && this.child == null) {
 		
 			int rand = (int) (Math.random()*2);
 			
-			if( rand == 0) 
+			if( rand == 0) {
 				child = new Man(this.posX/32 + 2, this.posY/32 + 4,"Fils");
-			else
+				nb_of_men ++;
+			}
+			else {
 				child = new Woman(this.posX/32 + 2, this.posY/32 + 4,"Fille");
+				nb_of_women ++;
+			}
 			
 		}
 		
@@ -169,6 +217,18 @@ public class House extends Non_human{
 
 	public boolean isSolid() {
 		return true;
+	}
+	
+	public void unmark() {
+		
+		if(this.isMarked()) {
+			System.err.println("La maison est deja demarquee");
+		}
+		
+		super.unmark();
+		
+		System.out.println("Demarque maison");
+		
 	}
 
 }

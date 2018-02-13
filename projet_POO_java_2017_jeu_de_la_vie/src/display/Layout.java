@@ -1,20 +1,30 @@
 package display;
 
 import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.GradientPaint;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Rectangle;
+import java.awt.Toolkit;
+import java.awt.geom.Rectangle2D;
+import java.io.File;
+import java.io.IOException;
 
+import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
 import diplayable.Displayable;
 import elements.Ground;
 import elements.Map;
 import entity.Entity;
+import entity.House;
+import entity.HouseDoor;
 import entity.Human;
 import entity.Non_human;
 
-public class Layout extends JPanel{
+public class Layout extends JPanel implements ScaledPan, KeyMovablePan{
 
 	private static final long serialVersionUID = 1L;
 	private Map content;
@@ -23,17 +33,16 @@ public class Layout extends JPanel{
 	private int view_pos_x;
 	private int view_pos_y;
 	
-	public Layout(int width, int height, int map_width, int map_height,int layout_scale){
+	public Layout(){
 		
-		this.content = new Map(map_width,map_height);
-		this.setLayout_scale(layout_scale);
-		this.setSize(width, height);
+		this.setScale(32);
 		this.view_pos_x = 75;
 		this.view_pos_y = 75;
 		
 	}
 	
 	public void paintComponent(Graphics g){
+		super.paintComponent(g);
 		
 		int begin_x = (this.view_pos_x*layout_scale/8 - this.getWidth()/2)/layout_scale - 1;
 		int begin_y = (this.view_pos_y*layout_scale/8 - this.getHeight()/2)/layout_scale - 1;
@@ -61,7 +70,12 @@ public class Layout extends JPanel{
 		//affichage damier
 		for(int i = begin_x ; i < end_x; i ++) {
 			for(int j = begin_y; j < end_y; j++) {
-				drawImageAt(content.get_ground(i, j),g);
+				
+				Ground gr = content.get_ground(i, j);
+				
+				if(gr != null)
+					drawImageAt(gr,g);
+				
 			}
 		}
 		
@@ -87,6 +101,27 @@ public class Layout extends JPanel{
 			}
 		}
 		
+		//affichage des statistiques
+		Graphics2D g2 = (Graphics2D) g;
+		
+		Toolkit t = Toolkit.getDefaultToolkit();
+		//g2.setPaint(new Color(0,0,0,50)); origine
+		g2.setPaint(new Color(255,255,255,100));
+		g2.fillRect(this.getWidth() - t.getScreenSize().width/5, 0,t.getScreenSize().width,t.getScreenSize().height/7);
+		
+		g2.setPaint(new Color(0,0,0,200));
+		g2.drawString("Statistiques :", this.getWidth() - t.getScreenSize().width/5+20, 20);
+		g2.drawString("Stock de nourriture : " , this.getWidth() - t.getScreenSize().width/5+20, 20+2*g2.getFontMetrics().getHeight());
+		g2.drawString("Nombre d'hommes vivants : ",  this.getWidth() - t.getScreenSize().width/5+20, 20+3*g2.getFontMetrics().getHeight());
+		g2.drawString("Nombre de femmes vivantes : ",  this.getWidth() - t.getScreenSize().width/5+20, 20+4*g2.getFontMetrics().getHeight());
+		g2.drawString("Nombre de cases contaminees : ",  this.getWidth() - t.getScreenSize().width/5+20, 20+5*g2.getFontMetrics().getHeight());
+		g2.drawString("Nombre d'unites de temps : ",  this.getWidth() - t.getScreenSize().width/5+20, 20+6*g2.getFontMetrics().getHeight());
+		
+		g2.drawString(String.valueOf(Human.getFoodAmount()), this.getWidth()-100, 20+2*g2.getFontMetrics().getHeight());
+		g2.drawString(String.valueOf(content.getNb_of_man()), this.getWidth()-100, 20+3*g2.getFontMetrics().getHeight());
+		g2.drawString(String.valueOf(content.getNb_of_woman()), this.getWidth()-100, 20+4*g2.getFontMetrics().getHeight());
+		g2.drawString(String.valueOf(content.getNb_of_herb()), this.getWidth()-100, 20+5*g2.getFontMetrics().getHeight());
+		g2.drawString(String.valueOf(content.getTime()), this.getWidth()-100, 20+6*g2.getFontMetrics().getHeight());
 	}
 	
 	/* *
@@ -106,11 +141,12 @@ public class Layout extends JPanel{
 			int scaled_width = d.get_width()*layout_scale/32;
 			int scaled_height = d.get_height()*layout_scale/32;
 
-			//d�calage� la position due la "camera"
+			//decalage du la position due la "camera"
 			left_top_corner_posX += this.getWidth()/2 - this.view_pos_x*this.layout_scale/8;
 			left_top_corner_posY += this.getHeight()/2 - this.view_pos_y*this.layout_scale/8;
 			
-			drawImage(d.get_img(), new Rectangle(left_top_corner_posX, left_top_corner_posY, scaled_width, scaled_height), d.selection_sprite(), g);
+			if(d.get_img() != null)
+				drawImage(d.get_img(), new Rectangle(left_top_corner_posX, left_top_corner_posY, scaled_width, scaled_height), d.selection_sprite(), g);
 			
 			if(!(d instanceof Ground)) {
 				Entity e = (Entity)d;
@@ -143,24 +179,29 @@ public class Layout extends JPanel{
 		
 	}
 
-	public int getLayout_scale(){
+	public int getScale(){
 		
 		return layout_scale;
 		
 	}
 	
-	public void setLayout_scale(int layout_scale){
+	public void setScale(int layout_scale){
 		
 		this.layout_scale = layout_scale;
 		
 	}
 	
-	public void time_flies(int duration) {
+	public void next_turn(int duration) throws Exception {
 		this.content.next_turn(duration);
 	}
 	
-	public void move_view(int dx, int dy) {
-		this.view_pos_x += dx;
-		this.view_pos_y += dy;
+	
+	public void setMap(Map m) {
+		this.content = m;
 	}
+	public void moveView(int x, int y) {
+		this.view_pos_x += x;
+		this.view_pos_y += y;
+	}
+	
 }

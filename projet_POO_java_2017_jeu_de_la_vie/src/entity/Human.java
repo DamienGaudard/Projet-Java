@@ -20,8 +20,14 @@ public abstract class Human extends Entity{
 	private int age_of_death;
 	private static int food_amount = 2000;
 	
+	// affichage
 	public static int getFoodAmount(){
 		return food_amount;
+	}
+	
+	// remise a zero
+	public static void initFoodAmount() {
+		food_amount = 2000;
 	}
 	
 	private int saciety;
@@ -30,6 +36,7 @@ public abstract class Human extends Entity{
 	private Non_human target;
 	protected ArrayList<Coord> path;
 	
+	// bloquage
 	private int time_bloqued;
 	
 	// variables animation
@@ -38,10 +45,12 @@ public abstract class Human extends Entity{
 	private Orientation caracter_orientation;
 	private Action caracter_action;
 	
+	// temps d'animations
 	private static final int animation_time_cut_corn = 2;
 	private static final int animation_time_cut_weed = 2;
-	private static final int animation_time_plant_corn = 3;
+	private static final int animation_time_plant_corn = 2;
 	
+	// occupation a faire une action
 	private boolean busy;
 	private int step_busy;
 	
@@ -77,6 +86,13 @@ public abstract class Human extends Entity{
 	}
 	
 	// affichage
+	
+	public void verifyCoords(int x, int y) throws Exception {
+		if(x != this.posX/32 || y != this.posY/32) {
+			System.err.println("dx = " + (posX-x*32) + " dy = " + (posY-y*32) );
+			throw new Exception();
+		}
+	}
 	
 	public int getPosX(){
 		return this.posX;
@@ -155,10 +171,8 @@ public abstract class Human extends Entity{
 				this.step_busy = 0;
 				this.target.destroy();
 				food_amount += 20;
-				
-				// replanter
-				this.caracter_action = Action.PLANT_CORN;
-				this.target = new PlantCorn(this.target.getPosX()/32,this.target.getPosY()/32);
+				this.unTarget();
+				this.path = null;
 				
 			}
 			else {
@@ -200,7 +214,6 @@ public abstract class Human extends Entity{
 				this.unTarget();
 				path = null;
 				this.caracter_action = Action.NONE;
-				System.out.println("fin plantation");
 				
 			}
 			else {
@@ -240,6 +253,7 @@ public abstract class Human extends Entity{
 				this.target.destroy();
 				this.unTarget();
 				path = null;
+				this.caracter_action = Action.NONE;
 				
 			}
 			else {
@@ -255,6 +269,7 @@ public abstract class Human extends Entity{
 	}
 	
 	public void exit_house() {
+		this.target = null;
 		this.caracter_orientation = Orientation.DOWN;
 		this.caracter_action = Action.LEAVE_HOUSE;
 	}
@@ -270,18 +285,14 @@ public abstract class Human extends Entity{
 					this.caracter_action = Action.CUT_CORN;
 				if(this.target instanceof Weed)
 					this.caracter_action = Action.CUT_WEED;
-				if(this.target instanceof PlantCorn) { //planter du ble meme si on ne vient pas d en couper
+				if(this.target instanceof PlantCorn) 
 					this.caracter_action = Action.PLANT_CORN;
-				}
 				if(this.target instanceof HouseDoor)
 					this.caracter_action = Action.ENTER_HOUSE;
 				
 			}
 			else{
 				
-				System.out.println(this.name);
-				System.out.println(path);
-				System.out.println(target.getClass());
 				Coord c = path.get(0);
 				int dx = c.getX() - this.posX/32;
 				int dy = c.getY() - this.posY/32;
@@ -356,8 +367,10 @@ public abstract class Human extends Entity{
 		
 	}
 	
+	// appelle pour verifier si le partenaire est toujours en vie
 	public abstract boolean checkPartner();
 	
+	// appelle si le partenaire meurt, ou bloquage
 	public abstract void rapture();
 	
 	public abstract boolean hasPartner();
@@ -446,6 +459,7 @@ public abstract class Human extends Entity{
 			path.remove(0);
 	}
 	
+	// deciblage, utilise en cas de bloquage
 	public void unTarget() {
 		if(this.target != null) {
 			this.target.unmark();
@@ -463,9 +477,9 @@ public abstract class Human extends Entity{
 		return this.target != null;
 	}
 	
+	// verifie si la cible est toujours vivante
 	public boolean checkTarget(){
 		if(this.target.isDying()){
-			System.out.println("untargeting");
 			this.target = null;
 			this.path = null;
 			this.busy = false;
@@ -485,6 +499,8 @@ public abstract class Human extends Entity{
 			return this.target.getClass();
 		}
 	}
+	
+	//appelle en cas de bloquage
 	
 	public void increase_time_bloqued() {
 		this.time_bloqued ++;

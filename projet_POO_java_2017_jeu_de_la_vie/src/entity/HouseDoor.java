@@ -14,6 +14,14 @@ public class HouseDoor extends Non_human{
 		this.concernedHouse = concernedHouse;
 		
 	}
+	
+	public int getNb_of_men() {
+		return concernedHouse.getNb_of_men();
+	}
+
+	public int getNb_of_women() {
+		return concernedHouse.getNb_of_women();
+	}
 
 	public void clock_tic() {
 		this.concernedHouse.clock_tic();
@@ -28,7 +36,7 @@ public class HouseDoor extends Non_human{
 		return false;
 	}
 	
-	public boolean enterHouse(Human human) {
+	public boolean enterHouse(Human human) throws Exception {
 		return this.concernedHouse.enterHouse(human);
 	}
 	

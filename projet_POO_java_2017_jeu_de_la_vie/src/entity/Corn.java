@@ -24,7 +24,7 @@ public class Corn extends Non_human{
 		this.entity_age ++;
 		if(entity_age>=0 && entity_age <= 7) this.state = 0;
 		else if(entity_age>=8 && entity_age <= 14) this.state = 1;
-		else if(entity_age>=15 && entity_age <= 30) this.state = 2;
+		else if(entity_age>=25 && entity_age <= 30) this.state = 2;
 		
 	}
 
@@ -46,6 +46,11 @@ public class Corn extends Non_human{
 	
 	public void destroy() {
 		this.killed = true;
+	}
+	
+	public void init() {
+		this.entity_age = 25;
+		this.state = 2;
 	}
 
 	// affichage

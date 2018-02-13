@@ -26,8 +26,10 @@ public abstract class Displayable{ // affichable
 	
 	public Image get_img(){
 		
-		return get_sprite_info().get_texture();
-		
+		if(get_sprite_info() != null)
+			return get_sprite_info().get_texture();
+		else
+			return null;
 	}
 	
 	/* *

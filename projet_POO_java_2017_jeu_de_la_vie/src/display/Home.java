@@ -9,6 +9,7 @@ import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.Insets;
 import java.awt.Rectangle;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -41,72 +42,25 @@ public class Home extends JPanel{
 	private House ho;
 	
 	//images des boutons
-	private static Image button_img;
-	private static Image play_img;
-	private static Image help_img;
-	private static Image quit_img;
 	
 	
-	public Home(){
+	public Home(JButton play, JButton help, JButton quit){
 		
 		this.setBackground(Color.cyan);
 		
-		try {
-			button_img = ImageIO.read(new File("wooden_plank.png"));
-			play_img = ImageIO.read(new File("play_text.png"));
-			help_img = ImageIO.read(new File("help_text.png"));
-			quit_img = ImageIO.read(new File("quit_text.png"));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		ma = new Man(0,0,"Osef");
+		wo = new Woman(0,0,"Osef");
+		gr = new Ground(0,0);
+		ho = new House(0,0);
 		
-		play = new JButton("Play") {
-			
-			private static final long serialVersionUID = 0L;
-			
-			public void paintComponent(Graphics g) {
-				g.drawImage(button_img,0,0, this.getWidth(), this.getHeight(),this);
-				g.drawImage(play_img,0,0, this.getWidth(), this.getHeight(),this);
-			}
-			
-		};
+		this.play = play;
+		this.help = help;
+		this.quit = quit;
 		
-		play.setOpaque(false);
-		play.setContentAreaFilled(false);
-		play.setBorderPainted(false);
-		
-		help = new JButton("Help"){
-			
-			private static final long serialVersionUID = 0L;
-			
-			public void paintComponent(Graphics g) {
-				g.drawImage(button_img,0,0, this.getWidth(), this.getHeight(),this);
-				g.drawImage(help_img,0,0, this.getWidth(), this.getHeight(),this);
-			}
-			
-		};
-		
-		help.setOpaque(false);
-		help.setContentAreaFilled(false);
-		help.setBorderPainted(false);
-		
-		quit = new JButton("Quit"){
-			
-			private static final long serialVersionUID = 0L;
-			
-			public void paintComponent(Graphics g) {
-				g.drawImage(button_img,0,0, this.getWidth(), this.getHeight(),this);
-				g.drawImage(quit_img,0,0, this.getWidth(), this.getHeight(),this);
-			}
-			
-		};
-		
-		quit.setOpaque(false);
-		quit.setContentAreaFilled(false);
-		quit.setBorderPainted(false);
-		
+
 		GridBagLayout gbl = new GridBagLayout();
 		GridBagConstraints gbc = new GridBagConstraints();
+
 		this.setLayout(gbl);
 		
 		gbc.ipady = 100;
@@ -122,20 +76,6 @@ public class Home extends JPanel{
 		gbc.gridy = 2;
 		add(quit,gbc);
 		
-		ActionHome go = new ActionHome();
-		play.addActionListener(go);
-		
-		ActionHome h = new ActionHome();
-		help.addActionListener(h);
-		
-		ActionHome leave = new ActionHome();
-		quit.addActionListener(leave);
-		
-		ma = new Man(0,0,"Osef");
-		wo = new Woman(0,0,"Osef");
-		gr = new Ground(0,0);
-		ho = new House(0,0);
-		
 	}
 	
 	public int getChoice(){
@@ -145,19 +85,6 @@ public class Home extends JPanel{
 	public void setChoice(int a){
 		this.choice = a;
 	}
-	
-	private class ActionHome implements ActionListener{
-		public void actionPerformed(ActionEvent e){
-			if(e.getSource() == play){
-				setChoice(0);
-			}else if(e.getSource() == help){
-				setChoice(1);
-			}else if(e.getSource() == quit){
-				setChoice(2);
-			}
-			
-		}
-	}	
 	
 	public void paintComponent(Graphics g){
 		super.paintComponent(g);
@@ -197,6 +124,8 @@ public class Home extends JPanel{
 		// effet
 		g2d.setPaint(new GradientPaint(0, 0, new Color(155,55,0,160), this.getWidth(), this.getHeight(), new Color(155,0,89,160)));
 		g.fillRect(0, 0, this.getWidth(), this.getHeight());
+		
+		
 		
 	}
 	
